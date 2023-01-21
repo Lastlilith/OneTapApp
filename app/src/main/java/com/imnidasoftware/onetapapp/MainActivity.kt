@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
 import com.imnidasoftware.onetapapp.navigation.SetupNavGraph
 import com.imnidasoftware.onetapapp.ui.theme.OneTapAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
