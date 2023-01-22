@@ -1,6 +1,5 @@
 package com.imnidasoftware.onetapapp.component
 
-import android.os.Message
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
