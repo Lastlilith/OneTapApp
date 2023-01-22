@@ -24,7 +24,9 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideDataStorePreferences(@ApplicationContext context: Context): DataStore<Preferences> {
+    fun provideDataStorePreferences(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create(
             produceFile = { context.preferencesDataStoreFile(PREFERENCES_NAME) }
         )
@@ -35,7 +37,7 @@ object RepositoryModule {
     fun provideDataStoreOperations(
         dataStore: DataStore<Preferences>
     ): DataStoreOperations {
-        return DataStoreOperationsImpl(dataStore)
+        return DataStoreOperationsImpl(dataStore = dataStore)
     }
 
     @Provides
@@ -43,6 +45,9 @@ object RepositoryModule {
     fun provideRepository(
         dataStoreOperations: DataStoreOperations
     ): Repository {
-        return RepositoryImpl(dataStoreOperations)
+        return RepositoryImpl(
+            dataStoreOperations = dataStoreOperations,
+        )
     }
+
 }
