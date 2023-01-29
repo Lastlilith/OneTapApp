@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.imnidasoftware.onetapapp.data.remote.KtorApi
 import com.imnidasoftware.onetapapp.data.repository.DataStoreOperationsImpl
 import com.imnidasoftware.onetapapp.data.repository.RepositoryImpl
 import com.imnidasoftware.onetapapp.domain.repository.DataStoreOperations
@@ -43,10 +44,12 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideRepository(
-        dataStoreOperations: DataStoreOperations
+        dataStoreOperations: DataStoreOperations,
+        ktorApi: KtorApi
     ): Repository {
         return RepositoryImpl(
             dataStoreOperations = dataStoreOperations,
+            ktorApi = ktorApi
         )
     }
 
