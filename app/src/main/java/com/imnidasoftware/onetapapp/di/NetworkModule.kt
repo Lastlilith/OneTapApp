@@ -1,5 +1,6 @@
 package com.imnidasoftware.onetapapp.di
 
+import com.imnidasoftware.onetapapp.data.remote.KtorApi
 import com.imnidasoftware.onetapapp.util.Constants.BASE_URL
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -47,5 +48,11 @@ object NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideKtorApi(retrofit: Retrofit): KtorApi {
+        return retrofit.create(KtorApi::class.java)
     }
 }
