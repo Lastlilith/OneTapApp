@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.imnidasoftware.onetapapp.ui.theme.topAppBarBackgroundColor
 import com.imnidasoftware.onetapapp.ui.theme.topAppBarContentColor
 import com.imnidasoftware.onetapapp.R
+import com.imnidasoftware.onetapapp.component.DisplayAlertDialog
 
 @Composable
 fun ProfileTopBar(
@@ -32,8 +33,14 @@ fun ProfileTopBarActions(
     onSave: () -> Unit,
     onDeleteAllConfirmed: () -> Unit
 ) {
+    var openDialog by remember { mutableStateOf(false) }
+    DisplayAlertDialog(
+        openDialoh = openDialog,
+        onYesClicked = { onDeleteAllConfirmed() },
+        onDialogClosed = { openDialog = false }
+    )
     SaveAction(onSave = onSave)
-    DeleteAllAction(onDeleteAllConfirmed = onDeleteAllConfirmed)
+    DeleteAllAction(onDeleteAllConfirmed = { openDialog = true })
 }
 
 @Composable
