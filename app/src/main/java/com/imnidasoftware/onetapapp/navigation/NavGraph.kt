@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.imnidasoftware.onetapapp.presentation.screen.login.LoginScreen
+import com.imnidasoftware.onetapapp.presentation.screen.profile.ProfileScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -16,7 +17,7 @@ fun SetupNavGraph(navController: NavHostController) {
             LoginScreen(navController = navController)
         }
         composable(route = Screen.Profile.route) {
-
+            ProfileScreen(navController = navController)
         }
     }
 }
