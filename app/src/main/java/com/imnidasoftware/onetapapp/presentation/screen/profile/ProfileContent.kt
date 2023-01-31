@@ -1,9 +1,6 @@
 package com.imnidasoftware.onetapapp.presentation.screen.profile
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -34,12 +31,12 @@ fun ProfileContent(
     onFirstNameChanged: (String) -> Unit,
     lastName: String,
     onLastNameChanged: (String) -> Unit,
-    emailAddress: String,
-    profilePhoto: String,
+    emailAddress: String?,
+    profilePhoto: String?,
     onSignOutClicked: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -54,7 +51,9 @@ fun ProfileContent(
             }
         }
         Column(
-            modifier = Modifier.weight(9f),
+            modifier = Modifier
+                .weight(9f)
+                .fillMaxWidth(0.7f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
