@@ -1,14 +1,12 @@
 package com.imnidasoftware.onetapapp.presentation.screen.profile
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.imnidasoftware.onetapapp.domain.model.ApiResponse
-import com.imnidasoftware.onetapapp.domain.model.MessageBarState
-import com.imnidasoftware.onetapapp.domain.model.User
-import com.imnidasoftware.onetapapp.domain.model.UserUpdate
+import com.imnidasoftware.onetapapp.domain.model.*
 import com.imnidasoftware.onetapapp.domain.repository.Repository
 import com.imnidasoftware.onetapapp.util.Constants.MAX_LENGTH
 import com.imnidasoftware.onetapapp.util.RequestState
@@ -164,6 +162,24 @@ class ProfileViewModel @Inject constructor(
                 _apiResponse.value = RequestState.Error(e)
                 _messageBarState.value = MessageBarState(error = e)
             }
+        }
+    }
+
+    fun verifyTokenOnBackend(request: ApiRequest) {
+        Log.d("LoginViewModel", request.tokenId)
+        _apiResponse.value = RequestState.Loading
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                val response = repository.verifyTokenOnBackend(request = request)
+                _apiResponse.value = RequestState.Success(response)
+                _messageBarState.value = MessageBarState(
+                    message = response.message,
+                    error = response.error
+                )
+            }
+        } catch (e: Exception) {
+            _apiResponse.value = RequestState.Error(e)
+            _messageBarState.value = MessageBarState(error = e)
         }
     }
 

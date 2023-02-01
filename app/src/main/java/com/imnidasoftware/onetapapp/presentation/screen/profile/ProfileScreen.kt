@@ -14,6 +14,10 @@ import com.imnidasoftware.onetapapp.domain.model.ApiResponse
 import com.imnidasoftware.onetapapp.navigation.Screen
 import com.imnidasoftware.onetapapp.util.RequestState
 import com.google.android.gms.auth.api.identity.Identity
+import com.imnidasoftware.onetapapp.domain.model.ApiRequest
+import com.imnidasoftware.onetapapp.presentation.screen.common.StartActivityForResult
+import com.imnidasoftware.onetapapp.presentation.screen.common.signIn
+import retrofit2.HttpException
 
 @ExperimentalCoilApi
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -55,6 +59,36 @@ fun ProfileScreen(
     )
 
     val activity = LocalContext.current as Activity
+
+    StartActivityForResult(
+        key = apiResponse,
+        onResultReceived = { tokenId ->
+            profileViewModel.verifyTokenOnBackend(request = ApiRequest(tokenId = tokenId))
+        },
+        onDialogDismissed = {
+            profileViewModel.saveSignedInState(signedIn = false)
+            navigateToLoginScreen(navController = navController)
+        }
+    ) { activityLauncher ->
+        if (apiResponse is RequestState.Success) {
+            val response = (apiResponse as RequestState.Success<ApiResponse>).data
+            if (response.error is HttpException && response.error.code() == 401) {
+                signIn(
+                    activity = activity,
+                    accountNotFound = {
+                        profileViewModel.saveSignedInState(signedIn = false)
+                        navigateToLoginScreen(navController = navController)
+                    },
+                    launchActivityResult = {
+                        activityLauncher.launch(it)
+                    }
+                )
+            }
+        } else if (apiResponse is RequestState.Error) {
+            profileViewModel.saveSignedInState(signedIn = false)
+            navigateToLoginScreen(navController = navController)
+        }
+    }
 
     LaunchedEffect(key1 = clearSessionResponse) {
         if (clearSessionResponse is RequestState.Success &&
