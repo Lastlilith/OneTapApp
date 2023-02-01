@@ -23,7 +23,7 @@ fun ProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val apiResponse by profileViewModel.apiResponse
-    val clearSessionResponse  by profileViewModel.clearSessionResponse
+    val clearSessionResponse by profileViewModel.clearSessionResponse
     val messageBarState by profileViewModel.messageBarState
 
     val user by profileViewModel.user
@@ -34,7 +34,7 @@ fun ProfileScreen(
         topBar = {
             ProfileTopBar(
                 onSave = { profileViewModel.updateUserInfo() },
-                onDeleteAllConfirmed = {}
+                onDeleteAllConfirmed = { profileViewModel.deleteUser() }
             )
         },
         content = {

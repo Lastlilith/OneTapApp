@@ -147,6 +147,26 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun deleteUser() {
+        _clearSessionResponse.value = RequestState.Loading
+        _apiResponse.value = RequestState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.deleteUser()
+                _clearSessionResponse.value = RequestState.Success(response)
+                _apiResponse.value = RequestState.Success(response)
+                _messageBarState.value = MessageBarState(
+                    message = response.message,
+                    error = response.error
+                )
+            } catch (e: Exception) {
+                _clearSessionResponse.value = RequestState.Error(e)
+                _apiResponse.value = RequestState.Error(e)
+                _messageBarState.value = MessageBarState(error = e)
+            }
+        }
+    }
+
     fun saveSignedInState(signedIn: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.saveSignedInState(signedIn = signedIn)
