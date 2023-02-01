@@ -1,12 +1,19 @@
 package com.imnidasoftware.onetapapp.presentation.screen.profile
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
+import com.imnidasoftware.onetapapp.domain.model.ApiResponse
+import com.imnidasoftware.onetapapp.navigation.Screen
+import com.imnidasoftware.onetapapp.util.RequestState
+import com.google.android.gms.auth.api.identity.Identity
 
 @ExperimentalCoilApi
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -16,6 +23,7 @@ fun ProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val apiResponse by profileViewModel.apiResponse
+    val clearSessionResponse  by profileViewModel.clearSessionResponse
     val messageBarState by profileViewModel.messageBarState
 
     val user by profileViewModel.user
@@ -39,8 +47,33 @@ fun ProfileScreen(
                 onLastNameChanged = { profileViewModel.updateLastName(it) },
                 emailAddress = user?.emailAddress,
                 profilePhoto = user?.profilePhoto,
-                onSignOutClicked = {}
+                onSignOutClicked = {
+                    profileViewModel.clearSession()
+                }
             )
         }
     )
+
+    val activity = LocalContext.current as Activity
+
+    LaunchedEffect(key1 = clearSessionResponse) {
+        if (clearSessionResponse is RequestState.Success &&
+            (clearSessionResponse as RequestState.Success<ApiResponse>).data.success
+        ) {
+            val oneTapClient = Identity.getSignInClient(activity)
+            oneTapClient.signOut()
+            profileViewModel.saveSignedInState(signedIn = false)
+            navigateToLoginScreen(navController = navController)
+        }
+    }
+}
+
+private fun navigateToLoginScreen(
+    navController: NavHostController
+) {
+    navController.navigate(route = Screen.Login.route) {
+        popUpTo(route = Screen.Login.route) {
+            inclusive = true
+        }
+    }
 }

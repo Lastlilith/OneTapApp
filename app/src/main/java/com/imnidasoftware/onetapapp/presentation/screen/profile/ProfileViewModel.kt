@@ -15,6 +15,7 @@ import com.imnidasoftware.onetapapp.util.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,8 +36,14 @@ class ProfileViewModel @Inject constructor(
         mutableStateOf(RequestState.Idle)
     val apiResponse: State<RequestState<ApiResponse>> = _apiResponse
 
+    private val _clearSessionResponse: MutableState<RequestState<ApiResponse>> =
+        mutableStateOf(RequestState.Idle)
+    val clearSessionResponse: State<RequestState<ApiResponse>> = _clearSessionResponse
+
     private val _messageBarState: MutableState<MessageBarState> = mutableStateOf(MessageBarState())
     val messageBarState: State<MessageBarState> = _messageBarState
+
+
 
     init {
         getUserInfo()
@@ -46,7 +53,9 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _apiResponse.value = RequestState.Loading
             try {
-                val response = repository.getUserInfo()
+                val response = withContext(Dispatchers.IO) {
+                    repository.getUserInfo()
+                }
                 _apiResponse.value = RequestState.Success(response)
                 _messageBarState.value = MessageBarState(
                     message = response.message,
@@ -71,10 +80,6 @@ class ProfileViewModel @Inject constructor(
                 if (user.value != null) {
                     val response = repository.getUserInfo()
                     verifyAndUpdate(currentUser = response)
-                    _messageBarState.value = MessageBarState(
-                        message = response.message,
-                        error = response.error
-                    )
                 }
             } catch (e: Exception) {
                 _apiResponse.value = RequestState.Error(e)
@@ -98,22 +103,53 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             if (verified) {
-                val response = repository.updateUser(
-                    userUpdate = UserUpdate(
-                        firstName = firstName.value,
-                        lastName = lastName.value
+                try {
+                    val response = repository.updateUser(
+                        userUpdate = UserUpdate(
+                            firstName = firstName.value,
+                            lastName = lastName.value
+                        )
                     )
-                )
-                _apiResponse.value = RequestState.Success(response)
-                _messageBarState.value = MessageBarState(
-                    message = response.message,
-                    error = response.error
-                )
+                    _apiResponse.value = RequestState.Success(response)
+                    _messageBarState.value = MessageBarState(
+                        message = response.message,
+                        error = response.error
+                    )
+                } catch (e: Exception) {
+                    _apiResponse.value = RequestState.Error(e)
+                    _messageBarState.value = MessageBarState(error = e)
+                }
             } else {
                 _apiResponse.value =
                     RequestState.Success(ApiResponse(success = false, error = exception))
                 _messageBarState.value = MessageBarState(error = exception)
             }
+        }
+    }
+
+    fun clearSession() {
+        _clearSessionResponse.value = RequestState.Loading
+        _apiResponse.value = RequestState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.clearSession()
+                _clearSessionResponse.value = RequestState.Success(response)
+                _apiResponse.value = RequestState.Success(response)
+                _messageBarState.value = MessageBarState(
+                    message = response.message,
+                    error = response.error
+                )
+            } catch (e: Exception) {
+                _clearSessionResponse.value = RequestState.Error(e)
+                _apiResponse.value = RequestState.Error(e)
+                _messageBarState.value = MessageBarState(error = e)
+            }
+        }
+    }
+
+    fun saveSignedInState(signedIn: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.saveSignedInState(signedIn = signedIn)
         }
     }
 

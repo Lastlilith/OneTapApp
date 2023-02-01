@@ -40,7 +40,7 @@ fun ProfileTopBarActions(
         onDialogClosed = { openDialog = false }
     )
     SaveAction(onSave = onSave)
-    DeleteAllAction(onDeleteAllConfirmed = { openDialog = true })
+    DeleteAllAction(onDelete = { openDialog = true })
 }
 
 @Composable
@@ -55,7 +55,7 @@ fun SaveAction(onSave: () -> Unit) {
 }
 
 @Composable
-fun DeleteAllAction(onDeleteAllConfirmed: () -> Unit) {
+fun DeleteAllAction(onDelete: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     IconButton(onClick = { expanded = true }) {
         Icon(
@@ -70,7 +70,7 @@ fun DeleteAllAction(onDeleteAllConfirmed: () -> Unit) {
             DropdownMenuItem(
                 onClick = {
                     expanded = false
-                    onDeleteAllConfirmed()
+                    onDelete()
                 }
             ) {
                 Text(
